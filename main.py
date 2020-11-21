@@ -1,7 +1,6 @@
 import sys
 import numpy as np
 import pandas
-from scipy.stats import norm
 
 
 group_size = 7
@@ -9,7 +8,6 @@ size_sigma = 1
 mix = ['gender', 'nationality']
 match = ['age', 's1', 's2', 's3']
 scalings = {'gender': 0.2, 'nationality': 0.2, 'age': 0.2, 's1': 0.2, 's2': 0.8, 's3': 1}
-# scalings = {'gender': 0., 'nationality': 0., 'age': 0., 's1': 0., 's2': 0., 's3': 1}
 
 genders = {'Male 男': 1, 'Female 女': -1}
 
@@ -56,7 +54,6 @@ students['nationality'] = students['nationality'].astype(float)
 
 # remove rows without valid scores
 students.dropna(inplace=True)
-
 
 # calculate z-scores
 for match_key in match:
@@ -109,6 +106,8 @@ for i in range(30):
 
 students.loc[:, 'group'] = best_grouping
 
+
+# calculate distances to group means and display them using asterisks
 students_raw['d'] = np.nan
 for group_num in range(num_groups):
     means = students.loc[students.group == group_num].mean()
@@ -129,13 +128,11 @@ def format_d(d):
 students_raw['d'] = students_raw.d.apply(format_d)
 
 
-# show groups
+# save and print groups sorted by mean s3
 average_s3s = []
 for group_num in range(num_groups):
     average_s3s.append(students.loc[students.group == group_num, 's3'].mean())
-
 sorted_indices = np.argsort(average_s3s)
-
 
 with pandas.ExcelWriter('sorted.xlsx', engine='xlsxwriter') as writer:
     workbook = writer.book
